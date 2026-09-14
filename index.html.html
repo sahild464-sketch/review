@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Review — Brilliance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d1117; --surface:#151b23; --surface-2:#1c242e; --line:#28313c; --line-soft:#1f2731;
+    --ink:#eef1f5; --muted:#93a0b0; --faint:#5c6775;
+    --gold:#cda24f; --gold-hi:#e6cd84; --gold-deep:#9c7b36; --gold-soft:rgba(205,162,79,.13); --gold-line:rgba(205,162,79,.34);
+    --good:#7fb8a6; --warn:#d08a72;
+    --serif:"Cormorant Garamond",Georgia,serif;
+    --sans:"Hanken Grotesk",-apple-system,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:15px; line-height:1.5; -webkit-font-smoothing:antialiased}
+
+  .bar{position:sticky; top:0; z-index:30; background:rgba(13,17,23,.78); backdrop-filter:blur(12px) saturate(120%); border-bottom:1px solid var(--line-soft)}
+  .bar-in{display:flex; align-items:center; gap:16px; height:62px; max-width:1080px; margin:0 auto; padding:0 26px}
+  .brand{display:flex; align-items:center; gap:11px}
+  .seal{width:32px; height:32px; border-radius:50%; flex:none; display:grid; place-items:center; color:#20170a; font-size:12px; background:radial-gradient(circle at 32% 28%,var(--gold-hi),var(--gold) 46%,var(--gold-deep)); box-shadow:0 1px 3px rgba(0,0,0,.45), inset 0 1px 1px rgba(255,255,255,.35)}
+  .wm{font-weight:600; font-size:15px; letter-spacing:.01em; white-space:nowrap}
+  .wm em{font-family:var(--serif); font-style:italic; font-weight:500; color:var(--muted); font-size:16px; margin-left:7px}
+  @media(max-width:520px){ .wm em{display:none} }
+  .spring{flex:1}
+  .seg{display:flex; gap:2px; background:var(--surface); border:1px solid var(--line-soft); border-radius:9px; padding:3px}
+  .seg button{font:inherit; font-size:13.5px; font-weight:500; color:var(--muted); background:transparent; border:0; padding:6px 15px; border-radius:6px; cursor:pointer}
+  .seg button[aria-selected="true"]{background:var(--surface-2); color:var(--ink); box-shadow:inset 0 0 0 1px var(--gold-line)}
+  .nav{display:flex; gap:5px}
+  .nav button{font:inherit; color:var(--muted); background:transparent; border:1px solid var(--line-soft); width:33px; height:33px; border-radius:8px; cursor:pointer; display:grid; place-items:center; font-size:15px}
+  .nav button:hover{color:var(--ink); border-color:var(--faint)}
+  .nav .today{width:auto; padding:0 13px; font-size:13px}
+  @media(max-width:470px){ .bar-in{gap:9px; padding:0 16px} .seg button{padding:6px 11px} .nav .today{display:none} }
+
+  /* hero */
+  .hero{position:relative; min-height:min(780px,90vh); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:clamp(14px,2.4vh,26px); padding:24px 22px 40px; text-align:center; overflow:hidden}
+  .hero::before{content:""; position:absolute; inset:0; background:radial-gradient(60% 50% at 50% 42%, #172029 0%, rgba(23,32,41,0) 70%); pointer-events:none}
+  .hero .kick{position:relative; color:var(--muted); font-size:13px; letter-spacing:.06em; margin:0}
+  .hero .h-date{position:relative; font-family:var(--serif); font-weight:500; font-size:clamp(21px,4vw,27px); color:var(--ink); margin:2px 0 0; letter-spacing:.01em}
+  canvas#gem{position:relative; width:min(80vw,440px); height:min(80vw,440px); display:block; cursor:grab; touch-action:none}
+  canvas#gem:active{cursor:grabbing}
+  .hero .frame{position:relative; font-family:var(--serif); font-style:italic; font-size:clamp(16px,2.6vw,20px); color:var(--muted); margin:0; max-width:30ch; line-height:1.4}
+  .hero-glance{position:relative; display:flex; gap:clamp(20px,5vw,44px); margin-top:2px}
+  .hg{display:flex; flex-direction:column; align-items:center; gap:2px}
+  .hg .v{font-family:var(--serif); font-weight:600; font-size:26px; color:var(--gold); font-variant-numeric:tabular-nums; line-height:1}
+  .hg .l{color:var(--muted); font-size:12px; letter-spacing:.02em}
+  .hint{position:relative; color:var(--faint); font-size:12px; letter-spacing:.03em; margin:0; transition:opacity .6s}
+  .scrolldown{position:absolute; bottom:16px; left:50%; transform:translateX(-50%); color:var(--faint); font-size:18px; opacity:.7; animation:bob 2.4s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,5px)}}
+  @media(prefers-reduced-motion:reduce){ .scrolldown{animation:none} }
+
+  /* content */
+  .wrap{max-width:760px; margin:0 auto; padding:8px 26px 90px}
+  section{padding:26px 0; border-top:1px solid var(--line)}
+  section:first-child{border-top:0}
+  .sec-h{display:flex; align-items:center; gap:12px; margin:0 0 18px}
+  .sec-h h2{font-family:var(--serif); font-weight:600; font-size:25px; margin:0}
+  .sec-h .count{color:var(--faint); font-size:13px; font-variant-numeric:tabular-nums}
+  .sec-h .spring{flex:1}
+  .editbtn{font:inherit; font-size:12.5px; color:var(--muted); background:none; border:1px solid var(--line-soft); border-radius:7px; padding:5px 12px; cursor:pointer}
+  .editbtn:hover{color:var(--ink); border-color:var(--faint)}
+  .subh{font-family:var(--serif); font-style:italic; font-size:15px; color:var(--faint); margin:20px 0 8px}
+  .subh:first-child{margin-top:0}
+
+  .cols{display:grid; grid-template-columns:1fr 1fr; gap:36px}
+  @media(max-width:620px){ .cols{grid-template-columns:1fr; gap:24px} }
+  .colhead{display:flex; align-items:center; gap:9px; margin:0 0 10px; font-family:var(--serif); font-style:italic; font-size:16px; color:var(--muted)}
+  .colhead .dt{width:7px; height:7px; border-radius:50%; background:var(--faint)}
+  .colhead.good .dt{background:var(--good)} .colhead.warn .dt{background:var(--warn)}
+  ul.list{list-style:none; margin:0; padding:0}
+  li.row{display:flex; gap:12px; padding:7px 0}
+  li.row .lead{width:5px; height:5px; border-radius:50%; background:var(--good); margin-top:9px; flex:none}
+  li.row .body{flex:1}
+  .check{display:flex; gap:12px; align-items:flex-start; padding:8px 0; width:100%; text-align:left; background:none; border:0; color:inherit; font:inherit; cursor:pointer}
+  .box{flex:none; width:18px; height:18px; margin-top:1px; border:1.5px solid var(--faint); border-radius:5px; display:grid; place-items:center; transition:border-color .12s,background .12s}
+  .box svg{width:11px; height:11px; opacity:0; transform:scale(.6); transition:opacity .12s,transform .12s}
+  .check[aria-checked="true"] .box{background:var(--gold); border-color:var(--gold)}
+  .check[aria-checked="true"] .box svg{opacity:1; transform:scale(1)}
+  .check[aria-checked="true"] .txt{color:var(--faint); text-decoration:line-through}
+  .txt .meta{color:var(--faint); font-size:12.5px; margin-top:2px; text-decoration:none; display:block}
+  .txt .meta.over{color:var(--warn)}
+
+  .prac{display:flex; flex-wrap:wrap; gap:9px}
+  .pchip{display:inline-flex; align-items:center; gap:9px; border:1px solid var(--line-soft); background:var(--surface); border-radius:11px; padding:10px 14px; cursor:pointer; font:inherit; color:var(--ink); transition:border-color .12s,background .12s}
+  .pchip:hover{border-color:var(--faint)}
+  .pchip .pbox{width:15px; height:15px; border:1.5px solid var(--faint); border-radius:5px; display:grid; place-items:center; flex:none}
+  .pchip .pbox svg{width:9px; height:9px; opacity:0}
+  .pchip[aria-pressed="true"]{background:var(--gold-soft); border-color:var(--gold-line)}
+  .pchip[aria-pressed="true"] .pbox{background:var(--gold); border-color:var(--gold)}
+  .pchip[aria-pressed="true"] .pbox svg{opacity:1}
+  .pchip .streak{color:var(--gold); font-size:12px; font-variant-numeric:tabular-nums}
+  .pedit{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+  .peditrow{display:inline-flex; align-items:center; gap:2px}
+  .pedit input{background:var(--surface); border:1px solid var(--line-soft); border-radius:8px; padding:8px 11px; color:var(--ink); font:inherit; font-size:14px; width:158px}
+  .pedit input:focus{outline:none; border-color:var(--gold-line); box-shadow:0 0 0 3px var(--gold-soft)}
+  .rm{background:none; border:0; color:var(--faint); font-size:18px; line-height:1; cursor:pointer; padding:0 5px}
+  .rm:hover{color:var(--warn)}
+  .addp,.addarea{background:none; border:1px dashed var(--line); border-radius:8px; padding:8px 13px; color:var(--muted); cursor:pointer; font:inherit; font-size:13.5px}
+  .addp:hover,.addarea:hover{border-color:var(--gold-line); color:var(--gold)}
+
+  .ledger{display:flex; flex-direction:column}
+  .led{display:flex; align-items:center; gap:16px; padding:13px 0; border-top:1px solid var(--line-soft)}
+  .led:first-child{border-top:0}
+  .led .lname{font-weight:500; font-size:14.5px; flex:none; width:150px; display:flex; align-items:center; gap:10px}
+  @media(max-width:620px){ .led .lname{width:118px} }
+  .led .lsd{width:8px; height:8px; border-radius:50%; flex:none}
+  .lsd.good{background:var(--good)} .lsd.warn{background:var(--warn)} .lsd.neutral{background:var(--faint)} .lsd.on{background:var(--gold)}
+  .led .lstat{color:var(--muted); font-size:13.5px; flex:1}
+  .led input.lstat{background:none; border:0; border-bottom:1px solid transparent; padding:3px 0; color:var(--ink); font:inherit; font-size:13.5px; width:100%}
+  .led input.lstat:focus{outline:none; border-bottom-color:var(--gold-line)}
+  .led input.lstat::placeholder{color:var(--faint)}
+  .led input.nameedit{background:var(--surface-2); border:1px solid var(--line-soft); border-radius:6px; padding:4px 8px; color:var(--ink); font:inherit; font-size:14px; font-weight:500; width:128px}
+  .dots7{display:inline-flex; gap:5px; flex:none}
+  .dots7 span{width:9px; height:9px; border-radius:50%; box-shadow:inset 0 0 0 1px var(--line)}
+  .dots7 span.on{background:var(--gold); box-shadow:none}
+  .led .cnt{font-family:var(--serif); font-weight:600; color:var(--gold); font-size:17px; width:40px; text-align:right; font-variant-numeric:tabular-nums; flex:none}
+
+  .agenda{display:flex; flex-direction:column}
+  .ag{display:flex; gap:16px; padding:10px 0; border-top:1px solid var(--line-soft)}
+  .ag:first-child{border-top:0}
+  .ag time{font-variant-numeric:tabular-nums; color:var(--gold); font-size:13.5px; width:52px; flex:none; padding-top:1px}
+  .ag .what{flex:1}
+  .ag .cal{color:var(--faint); font-size:12px; margin-top:2px}
+  .lbl{font-family:var(--serif); font-style:italic; font-size:16px; color:var(--muted); margin:22px 0 10px}
+  .top3{display:flex; flex-direction:column; gap:8px}
+  .t3{display:flex; gap:12px; align-items:center}
+  .t3 .num{font-family:var(--serif); font-weight:600; font-size:20px; color:var(--gold); width:16px; flex:none; text-align:center}
+  .t3 input{flex:1; font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--line-soft); border-radius:8px; padding:10px 13px}
+  .t3 input:focus{outline:none; border-color:var(--gold-line); box-shadow:0 0 0 3px var(--gold-soft)}
+  .t3 input.done{color:var(--faint); text-decoration:line-through}
+  .t3 .tick{width:22px; height:22px; border:0; background:none; color:var(--faint); cursor:pointer; flex:none; font-size:15px}
+  .t3 .tick[aria-pressed="true"]{color:var(--good)}
+  .field{margin-top:18px} .field:first-child{margin-top:0}
+  .field label{display:block; color:var(--ink); font-size:14px; font-weight:500; margin-bottom:8px}
+  .field .hint2{color:var(--faint); font-weight:400; font-size:12.5px}
+  .carry{background:var(--gold-soft); border:1px solid var(--gold-line); border-radius:9px; padding:11px 14px; font-size:13px; color:var(--muted); margin-bottom:11px}
+  .carry b{color:var(--gold); font-weight:500; font-family:var(--serif); font-size:15px}
+  textarea{width:100%; min-height:74px; resize:vertical; font:inherit; line-height:1.55; color:var(--ink); background:var(--surface); border:1px solid var(--line-soft); border-radius:10px; padding:12px 15px}
+  textarea:focus{outline:none; border-color:var(--gold-line); box-shadow:0 0 0 3px var(--gold-soft)}
+  .saved{color:var(--good); font-size:12.5px; height:16px; margin-top:10px; opacity:0; transition:opacity .2s}
+  .saved.show{opacity:1} .saved::before{content:"✓ "}
+  .empty{color:var(--muted); font-size:14px; padding:8px 0; line-height:1.55} .empty b{color:var(--ink); font-weight:500}
+
+  .foot{max-width:760px; margin:0 auto; padding:0 26px 44px}
+  details{border:1px solid var(--line-soft); border-radius:11px; background:var(--surface); overflow:hidden}
+  summary{cursor:pointer; padding:14px 16px; color:var(--muted); font-size:13.5px; list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"◆"; color:var(--gold); font-size:9px; margin-right:9px}
+  details[open] summary{border-bottom:1px solid var(--line-soft); color:var(--ink)}
+  .connect{padding:16px; font-size:13.5px; color:var(--muted); line-height:1.65}
+  .connect h4{color:var(--ink); margin:14px 0 4px; font-size:13.5px} .connect h4:first-child{margin-top:0}
+  .connect code{background:var(--surface-2); padding:1px 6px; border-radius:5px; font-size:12.5px}
+  .connect label{display:block; color:var(--ink); font-size:13px; margin:12px 0 5px; font-weight:500}
+  .connect input[type=text],.connect input[type=password]{width:100%; max-width:420px; background:var(--surface-2); border:1px solid var(--line-soft); border-radius:8px; padding:9px 12px; color:var(--ink); font:inherit; font-size:13.5px}
+  .connect input:focus{outline:none; border-color:var(--gold-line); box-shadow:0 0 0 3px var(--gold-soft)}
+  .connect .row{display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:6px}
+  .connect button{font:inherit; font-size:13px; color:var(--muted); background:none; border:1px solid var(--line-soft); border-radius:8px; padding:9px 14px; cursor:pointer}
+  .connect button:hover{color:var(--ink); border-color:var(--faint)}
+  .connect button.pri{background:var(--gold-soft); border-color:var(--gold-line); color:var(--gold)}
+  .connect .chk{display:flex; align-items:center; gap:9px; font-size:13.5px; color:var(--ink); cursor:pointer}
+  .connect .chk input{width:auto}
+  .connect hr{border:0; border-top:1px solid var(--line-soft); margin:16px 0}
+  .connect .st{font-size:12.5px; color:var(--faint)}
+  .connect .st.ok{color:var(--good)} .connect .st.err{color:var(--warn)}
+  .connect .warn{color:var(--warn); font-size:12px; margin-top:4px}
+  a{color:var(--gold)}
+  :focus-visible{outline:2px solid var(--gold); outline-offset:2px; border-radius:4px}
+</style>
+<script src="https://accounts.google.com/gsi/client" id="gsi" async defer></script>
+</head>
+<body>
+
+<div class="bar">
+  <div class="bar-in">
+    <div class="brand"><span class="seal">◆</span><span class="wm">Review<em>brilliance</em></span></div>
+    <div class="spring"></div>
+    <div class="seg" role="tablist" aria-label="Review type">
+      <button role="tab" id="tab-daily" aria-selected="true" onclick="setView('daily')">Daily</button>
+      <button role="tab" id="tab-weekly" aria-selected="false" onclick="setView('weekly')">Weekly</button>
+    </div>
+    <div class="nav">
+      <button aria-label="Previous" onclick="step(-1)">‹</button>
+      <button class="today" onclick="goToday()">Today</button>
+      <button aria-label="Next" onclick="step(1)">›</button>
+    </div>
+  </div>
+</div>
+
+<header class="hero">
+  <p class="kick" id="h-kick"></p>
+  <p class="h-date" id="h-date"></p>
+  <canvas id="gem" role="img" aria-label="An animated gemstone whose brilliance reflects your review"></canvas>
+  <p class="frame" id="h-frame"></p>
+  <div class="hero-glance" id="h-glance"></div>
+  <p class="hint" id="h-hint">Move to catch the light · drag to spin</p>
+  <div class="scrolldown">▾</div>
+</header>
+
+<div class="wrap"><main id="app"></main></div>
+
+<div class="foot" id="foot"></div>
+
+<script>
+"use strict";
+
+/* ===== WORK DATA ===== */
+const DATA={ asanaToken:null, calendars:["sahild464@gmail.com","sahil@dhanakgroup.com"],
+  dailySample:{ frame:"Three meetings, then the afternoon opens up.",
+    done:[{t:"Signed off Garden City POS go-live checklist"},{t:"Reviewed August silver-margin report"},{t:"Closed 2 Diamond Plaza customer follow-ups"}],
+    open:[{id:"d-dff",t:"Approve DFF plate-supplier quote",meta:"Overdue · Asana → Digital Flexo Fusion",over:true},{id:"d-patrick",t:"Reply to Patrick on Capital Centre staffing",meta:"Gmail · waiting 2 days"},{id:"d-lease",t:"Sign Garden City lease addendum",meta:"Due today"}],
+    tomorrow:[{time:"09:30",what:"Silver Oak leadership sync",cal:"dhanakgroup.com"},{time:"12:00",what:"Virtual try-on demo — GlamAR",prep:"Skim the GlamAR proposal before this"},{time:"16:00",what:"Open — hold for deep work"}],
+    top3:["Approve DFF quote","Make the GlamAR call","Garden City lease addendum"] },
+  weeklySample:{ frame:"A build-and-close week — Garden City landed, two things still drifting.",
+    wins:[{t:"Garden City POS live across all lanes"},{t:"Silver margin back to target after the August dip"},{t:"Try-on shortlist down to GlamAR vs Camweara"}],
+    slipping:[{id:"w-dff",t:"DFF plate-supplier quote",meta:"Overdue 5 days",over:true},{id:"w-sonia",t:"Sonia rebrand",meta:"No movement in 3 weeks",over:true},{id:"w-imaara",t:"Imaara renewal terms",meta:"Gmail · landlord awaiting reply"}],
+    ahead:[{time:"Wed",what:"Odoo phase-2 kickoff"},{time:"Thu",what:"Dhanak board prep"},{time:"Sat",what:"GlamAR demo"}],
+    areas:[{name:"Silver Oak",stat:"Garden City live; margin on target",s:"good"},{name:"Sonia",stat:"Rebrand stalled 3 weeks",s:"warn"},{name:"Dhanak Group",stat:"Board Thu; property review pending",s:"neutral"},{name:"Digital Flexo Fusion",stat:"Quote approval overdue",s:"warn"}],
+    top3:["Unblock DFF quote","Restart Sonia rebrand","Prep board deck"] } };
+function getData(view,key){
+  if(LIVE.on){ const d=LIVE.cache[ck(view,key)]; return d||null; }
+  if(view==="daily"&&key===dayKey(new Date()))return DATA.dailySample;
+  if(view==="weekly"&&key===weekKey(new Date()))return DATA.weeklySample;
+  return null;
+}
+
+/* ===== LIVE DATA (all client-side; secrets stay in this browser) ===== */
+const SET_KEY="review-dashboard:v1:settings";
+function safeParse(s){try{return JSON.parse(s)||{}}catch(e){return {}}}
+let settings=Object.assign({clientId:"",asanaToken:"",useLive:false,gmailOn:true},safeParse(localStorage.getItem(SET_KEY)));
+function saveSettings(){localStorage.setItem(SET_KEY,JSON.stringify(settings));}
+let LIVE={on:!!settings.useLive,token:null,tokenExp:0,cache:{},fetching:{},tried:{},workspace:null,status:{}};
+function ck(view,key){return view+"|"+key;}
+
+async function gapi(url){ const r=await fetch(url,{headers:{Authorization:"Bearer "+LIVE.token}}); if(!r.ok)throw new Error("Google "+r.status); return r.json(); }
+async function asanaGet(path){ const r=await fetch("https://app.asana.com/api/1.0"+path,{headers:{Authorization:"Bearer "+settings.asanaToken}}); if(!r.ok)throw new Error("Asana "+r.status); return (await r.json()).data; }
+function fmtT(start){ if(!start)return""; if(start.date)return"all-day"; const d=new Date(start.dateTime); return pad(d.getHours())+":"+pad(d.getMinutes()); }
+function shortFrom(f){ if(!f)return""; const m=f.match(/^(.*?)</); const n=m?m[1].trim().replace(/"/g,""):f; return n||f; }
+function frameFor(n){ return n===0?"A clear board — nothing waiting on you.":(n+" thing"+(n===1?"":"s")+" want your attention."); }
+
+async function calEvents(a,b){ const out=[]; if(!LIVE.token)return out;
+  for(const cal of DATA.calendars){ try{ const j=await gapi("https://www.googleapis.com/calendar/v3/calendars/"+encodeURIComponent(cal)+"/events?singleEvents=true&orderBy=startTime&timeMin="+a.toISOString()+"&timeMax="+b.toISOString());
+    (j.items||[]).forEach(ev=>out.push({time:fmtT(ev.start),what:ev.summary||"(busy)",cal:cal.split("@")[0],_s:(ev.start&&(ev.start.dateTime||ev.start.date))||""})); LIVE.status.cal="ok"; }catch(e){ LIVE.status.cal="err"; } }
+  out.sort((x,y)=>x._s.localeCompare(y._s)); return out; }
+async function gmailOpen(){ if(!settings.gmailOn||!LIVE.token)return []; try{
+  const list=await gapi("https://gmail.googleapis.com/gmail/v1/users/me/messages?maxResults=8&q="+encodeURIComponent("in:inbox is:unread -from:me"));
+  const out=[]; for(const m of (list.messages||[]).slice(0,6)){ const md=await gapi("https://gmail.googleapis.com/gmail/v1/users/me/messages/"+m.id+"?format=metadata&metadataHeaders=From&metadataHeaders=Subject"); const h={}; ((md.payload&&md.payload.headers)||[]).forEach(x=>h[x.name]=x.value); out.push({id:"gm-"+m.id,t:h.Subject||"(no subject)",meta:"Gmail · "+shortFrom(h.From)}); }
+  LIVE.status.gmail="ok"; return out; }catch(e){ LIVE.status.gmail="err"; return []; } }
+async function asanaTasks(sinceISO){ if(!settings.asanaToken)return {open:[],done:[]}; try{
+  if(!LIVE.workspace){ const ws=await asanaGet("/workspaces"); LIVE.workspace=ws&&ws[0]&&ws[0].gid; }
+  const today=dayKey(new Date());
+  const inc=await asanaGet("/tasks?assignee=me&workspace="+LIVE.workspace+"&completed_since=now&opt_fields=name,due_on,completed&limit=100");
+  const open=(inc||[]).filter(t=>!t.completed&&t.due_on&&t.due_on<=today).map(t=>({id:"as-"+t.gid,t:t.name,meta:(t.due_on<today?"Overdue":"Due today")+" · Asana",over:t.due_on<today}));
+  const dres=await asanaGet("/tasks?assignee=me&workspace="+LIVE.workspace+"&completed_since="+(sinceISO||today+"T00:00:00Z")+"&opt_fields=name,completed&limit=100");
+  const done=(dres||[]).filter(t=>t.completed).map(t=>({t:t.name}));
+  LIVE.status.asana="ok"; return {open,done}; }catch(e){ LIVE.status.asana="err"; return {open:[],done:[]}; } }
+
+async function buildDailyLive(d){ const s=new Date(d); s.setHours(0,0,0,0);
+  const [tom,gm,as]=await Promise.all([calEvents(addDays(s,1),addDays(s,2)),gmailOpen(),asanaTasks()]);
+  const open=as.open.concat(gm);
+  return {frame:frameFor(open.length),done:as.done,open,tomorrow:tom.length?tom:[{time:"",what:"Nothing scheduled"}],top3:[]}; }
+async function buildWeeklyLive(wd){ const mon=startOfWeek(wd);
+  const [ahead,gm,as]=await Promise.all([calEvents(addDays(mon,7),addDays(mon,14)),gmailOpen(),asanaTasks(dayKey(mon)+"T00:00:00Z")]);
+  const slipping=as.open.filter(x=>x.over).concat(gm);
+  return {frame:frameFor(slipping.length),wins:as.done.slice(0,6),slipping,ahead:ahead.length?ahead:[{time:"",what:"Open week"}],areas:[],top3:[]}; }
+
+async function refreshLive(){ if(!LIVE.on)return; const view=state.view; const key=view==="daily"?dayKey(state.daily):weekKey(state.weekly); const k=ck(view,key);
+  if(LIVE.fetching[k])return; LIVE.fetching[k]=true; LIVE.tried[k]=true;
+  try{ LIVE.cache[k]= view==="daily"?await buildDailyLive(state.daily):await buildWeeklyLive(state.weekly); }
+  catch(e){ LIVE.status.err=e.message; }
+  finally{ LIVE.fetching[k]=false; render(); updatePanel(); } }
+
+let tokenClient=null;
+function initGoogle(){ if(!window.google||!google.accounts||!google.accounts.oauth2||!settings.clientId)return false;
+  tokenClient=google.accounts.oauth2.initTokenClient({ client_id:settings.clientId,
+    scope:"https://www.googleapis.com/auth/calendar.readonly"+(settings.gmailOn?" https://www.googleapis.com/auth/gmail.metadata":""),
+    callback:r=>{ if(r&&r.access_token){ LIVE.token=r.access_token; LIVE.tokenExp=Date.now()+3500000; LIVE.on=true; settings.useLive=true; saveSettings(); LIVE.cache={}; LIVE.tried={}; render(); refreshLive(); updatePanel(); } } });
+  return true; }
+function signInGoogle(){ if(!tokenClient&&!initGoogle()){ alert("Google sign-in isn't ready — check your Client ID is saved and you're online."); return; } if(tokenClient)tokenClient.requestAccessToken(); }
+
+function buildPanel(){ const f=document.getElementById("foot"); if(!f)return;
+  f.innerHTML='<details><summary>Connect live data</summary><div class="connect">'
+    +'<p style="color:var(--muted);font-size:13px;margin:0 0 4px">Your work data loads through your own accounts, in this browser. Nothing goes to anyone else — secrets stay on this device.</p>'
+    +'<label>Google Client ID</label><div class="row"><input type="text" id="cid" placeholder="…apps.googleusercontent.com"><button id="cidsave">Save</button></div>'
+    +'<div class="row"><button class="pri" id="gsignin">Sign in with Google</button><span class="st" id="stg">not signed in</span></div>'
+    +'<label class="chk" style="margin-top:12px"><input type="checkbox" id="gmailtog"> Read Gmail (senders &amp; subjects only, never message text)</label>'
+    +'<hr><label>Asana token</label><div class="row"><input type="password" id="atok" placeholder="Personal access token"><button id="atoksave">Save</button><span class="st" id="sta"></span></div>'
+    +'<p class="warn">Stored only in this browser — never hardcode it if the page is public.</p>'
+    +'<hr><label class="chk"><input type="checkbox" id="uselive"> Use live data <span style="color:var(--faint)">(off = sample view)</span></label>'
+    +'<p class="st" id="srcst" style="margin-top:10px">Calendar – · Gmail – · Asana –</p>'
+    +'</div></details>';
+  f.querySelector("#cid").value=settings.clientId||"";
+  f.querySelector("#atok").value=settings.asanaToken||"";
+  f.querySelector("#gmailtog").checked=!!settings.gmailOn;
+  f.querySelector("#uselive").checked=!!settings.useLive;
+  f.querySelector("#cidsave").onclick=()=>{ settings.clientId=f.querySelector("#cid").value.trim(); saveSettings(); tokenClient=null; initGoogle(); updatePanel(); };
+  f.querySelector("#gsignin").onclick=signInGoogle;
+  f.querySelector("#gmailtog").onchange=e=>{ settings.gmailOn=e.target.checked; saveSettings(); tokenClient=null; };
+  f.querySelector("#atoksave").onclick=()=>{ settings.asanaToken=f.querySelector("#atok").value.trim(); saveSettings(); LIVE.workspace=null; LIVE.cache={}; LIVE.tried={}; if(LIVE.on)refreshLive(); updatePanel(); };
+  f.querySelector("#uselive").onchange=e=>{ settings.useLive=e.target.checked; LIVE.on=e.target.checked; saveSettings(); LIVE.cache={}; LIVE.tried={}; render(); if(LIVE.on)refreshLive(); };
+  updatePanel(); }
+function updatePanel(){ const g=document.getElementById("stg"); if(g){ g.textContent=LIVE.token?"signed in":"not signed in"; g.className="st "+(LIVE.token?"ok":""); }
+  const a=document.getElementById("sta"); if(a){ a.textContent=settings.asanaToken?"saved":""; a.className="st ok"; }
+  const s=document.getElementById("srcst"); if(s){ const m=x=>x==="ok"?"✓":x==="err"?"✕":"–"; s.innerHTML="Calendar "+m(LIVE.status.cal)+" · Gmail "+m(LIVE.status.gmail)+" · Asana "+m(LIVE.status.asana); } }
+
+/* ===== config ===== */
+const CONFIG_KEY="review-dashboard:v1:config";
+const DEFAULT_CONFIG={ practices:[{id:"train",name:"Train"},{id:"walk",name:"Walk the dog"},{id:"study",name:"MBA study"},{id:"make",name:"Make / shoot something"}],
+  lifeAreas:[{id:"fitness",name:"Fitness"},{id:"3dp",name:"3D printing"},{id:"photo",name:"Photography"},{id:"overland",name:"Overlanding (LC100)"},{id:"invest",name:"Investing (IBKR)"},{id:"learn",name:"MBA self-study"}] };
+function loadConfig(){ try{const s=JSON.parse(localStorage.getItem(CONFIG_KEY)); return s?Object.assign({},DEFAULT_CONFIG,s):JSON.parse(JSON.stringify(DEFAULT_CONFIG));}catch(e){return JSON.parse(JSON.stringify(DEFAULT_CONFIG));} }
+function saveConfig(c){ localStorage.setItem(CONFIG_KEY,JSON.stringify(c)); }
+
+/* ===== dates ===== */
+const DOW=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const MON=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function pad(n){return String(n).padStart(2,"0")}
+function dayKey(d){return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())}
+function addDays(d,n){const x=new Date(d);x.setDate(x.getDate()+n);return x}
+function startOfWeek(d){const x=new Date(d);const g=(x.getDay()+6)%7;x.setDate(x.getDate()-g);x.setHours(0,0,0,0);return x}
+function weekKey(d){return "wk-"+dayKey(startOfWeek(d))}
+function keyToMonday(key){const [y,mo,da]=key.replace("wk-","").split("-").map(Number);return new Date(y,mo-1,da)}
+
+/* ===== state ===== */
+const STORE="review-dashboard:v1";
+let state={view:"daily",daily:new Date(),weekly:new Date()};
+let editingPractices=false,editingAreas=false;
+function entryKey(v,k){return STORE+":"+v+":"+k}
+function load(v,k){ try{return JSON.parse(localStorage.getItem(entryKey(v,k)))||{}}catch(e){return {}} }
+function save(v,k,o){ localStorage.setItem(entryKey(v,k),JSON.stringify(o)) }
+function patch(v,k,fn){ const o=load(v,k); fn(o); save(v,k,o); }
+function setView(v){ state.view=v; editingPractices=editingAreas=false;
+  document.getElementById("tab-daily").setAttribute("aria-selected",v==="daily");
+  document.getElementById("tab-weekly").setAttribute("aria-selected",v==="weekly"); render(); }
+function step(n){ if(state.view==="daily")state.daily=addDays(state.daily,n); else state.weekly=addDays(state.weekly,n*7); render(); }
+function goToday(){ state[state.view]=new Date(); render(); }
+
+/* ===== DOM ===== */
+function el(tag,attrs,kids){ const n=document.createElement(tag);
+  if(attrs)for(const k in attrs){ if(k==="class")n.className=attrs[k]; else if(k==="html")n.innerHTML=attrs[k]; else if(k.startsWith("on"))n.addEventListener(k.slice(2),attrs[k]); else n.setAttribute(k,attrs[k]); }
+  (kids||[]).forEach(c=>{ if(c==null)return; n.appendChild(typeof c==="string"?document.createTextNode(c):c) }); return n; }
+const CHECK='<svg viewBox="0 0 24 24" fill="none"><path d="M4 12l5 5L20 6" stroke="#0d1117" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function secHead(title,count,action){ const h=el("div",{class:"sec-h"},[el("h2",null,[title]),count!=null?el("span",{class:"count"},[String(count)]):null]); if(action){h.appendChild(el("span",{class:"spring"}));h.appendChild(action);} return h; }
+function editToggle(which){ const on=which==="practices"?editingPractices:editingAreas; const b=el("button",{class:"editbtn"},[on?"Done":"Edit"]);
+  b.addEventListener("click",()=>{ if(which==="practices")editingPractices=!editingPractices; else editingAreas=!editingAreas; render(); }); return b; }
+
+/* ===== practices/areas/checks/top3/reflection (same engine) ===== */
+function streak(pid,end){ let n=0,d=new Date(end); for(let i=0;i<400;i++){ const e=load("daily",dayKey(d)); if(e.practices&&e.practices[pid]){n++;d=addDays(d,-1);}else break; } return n; }
+function weekPractice(pid,mon){ const dots=[]; let cnt=0; for(let i=0;i<7;i++){ const e=load("daily",dayKey(addDays(mon,i))); const on=!!(e.practices&&e.practices[pid]); dots.push(on); if(on)cnt++; } return {cnt,dots}; }
+function editPractice(i,v){const c=loadConfig();c.practices[i].name=v;saveConfig(c);}
+function removePractice(i){const c=loadConfig();c.practices.splice(i,1);saveConfig(c);render();}
+function addPractice(){const c=loadConfig();c.practices.push({id:"p"+Date.now(),name:"New practice"});saveConfig(c);render();}
+function practicesSection(key,dateForStreak){
+  const c=loadConfig(); const sec=el("section",null,[secHead("Practices",null,editToggle("practices"))]);
+  if(editingPractices){ const wrap=el("div",{class:"pedit"});
+    c.practices.forEach((p,i)=>{ const inp=el("input",{value:p.name}); inp.addEventListener("input",e=>editPractice(i,e.target.value)); const rm=el("button",{class:"rm",title:"Remove"},["×"]); rm.addEventListener("click",()=>removePractice(i)); wrap.appendChild(el("span",{class:"peditrow"},[inp,rm])); });
+    const add=el("button",{class:"addp"},["+ Add practice"]); add.addEventListener("click",addPractice); wrap.appendChild(add); sec.appendChild(wrap); return sec; }
+  if(!c.practices.length){ sec.appendChild(el("div",{class:"empty"},["No practices yet — hit Edit to add a few."])); return sec; }
+  const row=el("div",{class:"prac"});
+  c.practices.forEach(p=>{ const e=load("daily",key); const on=!!(e.practices&&e.practices[p.id]); const s=streak(p.id,dateForStreak);
+    const chip=el("button",{class:"pchip","aria-pressed":on}); chip.appendChild(el("span",{class:"pbox",html:CHECK})); chip.appendChild(el("span",null,[p.name])); if(s>=2)chip.appendChild(el("span",{class:"streak"},[s+"d"]));
+    chip.addEventListener("click",()=>{ patch("daily",key,o=>{o.practices=o.practices||{};o.practices[p.id]=!on}); render(); }); row.appendChild(chip); });
+  sec.appendChild(row); return sec; }
+function weekPracticesSection(mon){ const c=loadConfig(); const sec=el("section",null,[secHead("Practices this week")]);
+  if(!c.practices.length){ sec.appendChild(el("div",{class:"empty"},["No practices set — add them in the daily view."])); return sec; }
+  const led=el("div",{class:"ledger"}); c.practices.forEach(p=>{ const {cnt,dots}=weekPractice(p.id,mon); const dEl=el("div",{class:"dots7"}); dots.forEach(o=>dEl.appendChild(el("span",{class:o?"on":""}))); led.appendChild(el("div",{class:"led"},[el("span",{class:"lname"},[p.name]),el("span",{class:"lstat"}),dEl,el("span",{class:"cnt"},[cnt+"/7"])])); });
+  sec.appendChild(led); return sec; }
+function editArea(i,v){const c=loadConfig();c.lifeAreas[i].name=v;saveConfig(c);}
+function removeArea(i){const c=loadConfig();c.lifeAreas.splice(i,1);saveConfig(c);render();}
+function addArea(){const c=loadConfig();c.lifeAreas.push({id:"a"+Date.now(),name:"New area"});saveConfig(c);render();}
+function workRow(a){ return el("div",{class:"led"},[el("span",{class:"lname"},[el("span",{class:"lsd "+a.s}),a.name]),el("span",{class:"lstat"},[a.stat])]); }
+function lifeRow(key,a,i,val){ const row=el("div",{class:"led"}); const name=el("span",{class:"lname"},[el("span",{class:"lsd "+(val?"on":"neutral")})]);
+  if(editingAreas){ const ni=el("input",{class:"nameedit",value:a.name}); ni.addEventListener("input",e=>editArea(i,e.target.value)); name.appendChild(ni); } else name.appendChild(el("span",null,[a.name]));
+  row.appendChild(name); const inp=el("input",{class:"lstat",placeholder:"This week…",value:val||""}); let t;
+  inp.addEventListener("input",()=>{ clearTimeout(t); t=setTimeout(()=>patch("weekly",key,o=>{o.lifeStatus=o.lifeStatus||{};o.lifeStatus[a.id]=inp.value}),400); }); row.appendChild(inp);
+  if(editingAreas){ const rm=el("button",{class:"rm",title:"Remove"},["×"]); rm.addEventListener("click",()=>removeArea(i)); row.appendChild(rm); } return row; }
+function areasSection(key,data){ const c=loadConfig(); const sec=el("section",null,[secHead("By area",null,editToggle("areas"))]);
+  if(data&&data.areas&&data.areas.length){ sec.appendChild(el("p",{class:"subh"},["Work — connected"])); const l=el("div",{class:"ledger"}); data.areas.forEach(a=>l.appendChild(workRow(a))); sec.appendChild(l); }
+  sec.appendChild(el("p",{class:"subh"},["Life — yours to note"])); const l2=el("div",{class:"ledger"}); const st=load("weekly",key).lifeStatus||{};
+  c.lifeAreas.forEach((a,i)=>l2.appendChild(lifeRow(key,a,i,st[a.id]))); sec.appendChild(l2);
+  if(editingAreas){ const add=el("button",{class:"addarea",style:"margin-top:14px"},["+ Add area"]); add.addEventListener("click",addArea); sec.appendChild(add); } return sec; }
+function checkRow(view,key,item){ const done=!!((load(view,key).checks||{})[item.id]);
+  const btn=el("button",{class:"check","aria-checked":done,role:"checkbox"}); btn.appendChild(el("span",{class:"box",html:CHECK}));
+  const txt=el("span",{class:"txt"},[item.t]); if(item.meta)txt.appendChild(el("span",{class:"meta"+(item.over?" over":"")},[item.meta])); btn.appendChild(txt);
+  btn.addEventListener("click",()=>{ const now=btn.getAttribute("aria-checked")!=="true"; btn.setAttribute("aria-checked",now); patch(view,key,o=>{o.checks=o.checks||{};o.checks[item.id]=now}); syncBrilliance(); }); return btn; }
+function topThree(view,key,seed){ const saved=load(view,key).top3; const items=(saved&&saved.length?saved:(seed||["","",""]).map(t=>({text:t,done:false}))).slice(0,3); while(items.length<3)items.push({text:"",done:false});
+  const box=el("div",{class:"top3"}); function persist(){patch(view,key,o=>{o.top3=items})}
+  items.forEach((it,i)=>{ const inp=el("input",{type:"text",value:it.text,placeholder:"Priority "+(i+1)}); if(it.done)inp.classList.add("done"); inp.addEventListener("input",()=>{it.text=inp.value;persist()});
+    const tk=el("button",{class:"tick","aria-pressed":it.done,title:"Mark done",html:"✓"}); tk.addEventListener("click",()=>{it.done=!it.done;tk.setAttribute("aria-pressed",it.done);inp.classList.toggle("done",it.done);persist()});
+    box.appendChild(el("div",{class:"t3"},[el("span",{class:"num"},[String(i+1)]),inp,tk])); }); return box; }
+const DAILY_FIELDS=[{k:"well",label:"What went well",hint:"one thing"},{k:"friction",label:"What got in the way",hint:"one thing"}];
+const WEEKLY_FIELDS=[{k:"wins",label:"Wins",hint:"what went well this week"},{k:"blockers",label:"Blockers",hint:"what got in the way — anything recurring?"},{k:"goals",label:"Goals",hint:"what carries into next week",carry:true}];
+function reflectField(view,key,f){ const r=load(view,key).reflection||{}; const wrap=el("div",{class:"field"}); const lab=el("label",{for:"f-"+f.k},[f.label]); if(f.hint)lab.appendChild(el("span",{class:"hint2"},["  — "+f.hint])); wrap.appendChild(lab);
+  if(f.carry){ const prev=load("weekly",weekKey(addDays(keyToMonday(key),-7))).reflection||{}; if(prev.goals&&prev.goals.trim())wrap.appendChild(el("div",{class:"carry"},[el("b",null,["Last week's goals — "]),prev.goals])); }
+  const ta=el("textarea",{id:"f-"+f.k}); ta.value=r[f.k]||""; const tick=el("div",{class:"saved"},["Saved"]); let timer;
+  ta.addEventListener("input",()=>{ clearTimeout(timer); timer=setTimeout(()=>{ patch(view,key,o=>{o.reflection=o.reflection||{};o.reflection[f.k]=ta.value}); tick.classList.add("show"); setTimeout(()=>tick.classList.remove("show"),1400); },500); });
+  wrap.appendChild(ta); wrap.appendChild(tick); return wrap; }
+function reflectionSection(view,key,fields){ const sec=el("section",null,[secHead("Reflection")]); fields.forEach(f=>sec.appendChild(reflectField(view,key,f))); return sec; }
+
+/* ===== brilliance (data → gem) ===== */
+function dailyBrilliance(key,data){ const c=loadConfig(); const e=load("daily",key); let done=0; c.practices.forEach(p=>{if(e.practices&&e.practices[p.id])done++;});
+  const pr=c.practices.length?done/c.practices.length:0; const ch=(load("daily",key).checks)||{}; const closed=data?data.open.filter(x=>ch[x.id]).length/Math.max(1,data.open.length):0;
+  return Math.max(.2,Math.min(1,.35+.5*pr+.15*closed)); }
+function weeklyBrilliance(key,mon){ const c=loadConfig(); let t=0; c.practices.forEach(p=>{t+=weekPractice(p.id,mon).cnt;}); const denom=Math.max(1,c.practices.length*7); return Math.max(.2,Math.min(1,.3+.7*(t/denom))); }
+function syncBrilliance(){ if(state.view==="daily"){ const d=state.daily,key=dayKey(d); Gem.setBrilliance(dailyBrilliance(key,getData("daily",key))); } else { const mon=startOfWeek(state.weekly); Gem.setBrilliance(weeklyBrilliance(weekKey(state.weekly),mon)); } }
+
+/* ===== hero ===== */
+function heroStat(v,l){ return el("div",{class:"hg"},[el("span",{class:"v"},[v]),el("span",{class:"l"},[l])]); }
+function setHero(){
+  const K=document.getElementById("h-kick"),D=document.getElementById("h-date"),F=document.getElementById("h-frame"),G=document.getElementById("h-glance");
+  G.innerHTML="";
+  if(state.view==="daily"){ const d=state.daily,key=dayKey(d),data=getData("daily",key); const c=loadConfig(); const e=load("daily",key); const ch=(load("daily",key).checks)||{};
+    let done=0; c.practices.forEach(p=>{if(e.practices&&e.practices[p.id])done++;}); let best=0; c.practices.forEach(p=>{best=Math.max(best,streak(p.id,d));});
+    const open=data?data.open.filter(x=>!ch[x.id]).length:0;
+    K.textContent=DOW[d.getDay()]; D.textContent=d.getDate()+" "+MON[d.getMonth()]+" "+d.getFullYear(); F.textContent=data?data.frame:"A quiet day — yours to shape.";
+    if(data)G.appendChild(heroStat(String(open),open===1?"open loop":"open loops")); G.appendChild(heroStat(done+"/"+c.practices.length,"practices")); G.appendChild(heroStat(best+"d","best streak"));
+  } else { const mon=startOfWeek(state.weekly),sun=addDays(mon,6),key=weekKey(state.weekly),data=getData("weekly",key); const c=loadConfig();
+    let t=0; c.practices.forEach(p=>{t+=weekPractice(p.id,mon).cnt;}); const endRef=sun>new Date()?new Date():sun; let best=0; c.practices.forEach(p=>{best=Math.max(best,streak(p.id,endRef));});
+    const ch=(load("weekly",key).checks)||{}; const slip=data?data.slipping.filter(x=>!ch[x.id]).length:0;
+    const span=mon.getDate()+"–"+sun.getDate(); const sub=mon.getMonth()===sun.getMonth()?MON[mon.getMonth()]+" "+sun.getFullYear():MON[mon.getMonth()].slice(0,3)+"–"+MON[sun.getMonth()].slice(0,3)+" "+sun.getFullYear();
+    K.textContent="Week of"; D.textContent=span+" "+sub; F.textContent=data?data.frame:"A fresh week to compose.";
+    if(data)G.appendChild(heroStat(String(slip),"slipping")); G.appendChild(heroStat(String(t),"ticks")); G.appendChild(heroStat(best+"d","best streak"));
+  }
+  syncBrilliance();
+}
+
+/* ===== render content ===== */
+function render(){ const app=document.getElementById("app"); app.innerHTML=""; setHero(); if(state.view==="daily")buildDaily(app); else buildWeekly(app);
+  if(LIVE.on){ const key=state.view==="daily"?dayKey(state.daily):weekKey(state.weekly); const k=ck(state.view,key); if(!LIVE.cache[k]&&!LIVE.fetching[k]&&!LIVE.tried[k]) refreshLive(); } }
+function buildDaily(app){ const d=state.daily,key=dayKey(d),data=getData("daily",key);
+  app.appendChild(practicesSection(key,d));
+  if(data){ const cols=el("div",{class:"cols"});
+    const cd=el("div",null,[el("p",{class:"colhead good"},[el("span",{class:"dt"}),"Done today"])]); const ud=el("ul",{class:"list"}); data.done.forEach(x=>ud.appendChild(el("li",{class:"row"},[el("span",{class:"lead"}),el("span",{class:"body"},[x.t])]))); cd.appendChild(ud);
+    const co=el("div",null,[el("p",{class:"colhead warn"},[el("span",{class:"dt"}),"Still open"])]); const uo=el("ul",{class:"list"}); data.open.forEach(x=>uo.appendChild(el("li",null,[checkRow("daily",key,x)]))); co.appendChild(uo);
+    cols.append(cd,co); app.appendChild(el("section",null,[secHead("The day, closed"),cols]));
+    const ag=el("div",{class:"agenda"}); data.tomorrow.forEach(e=>ag.appendChild(el("div",{class:"ag"},[el("time",null,[e.time]),el("div",{class:"what"},[e.what,e.prep?el("div",{class:"cal"},["Prep · "+e.prep]):(e.cal?el("div",{class:"cal"},[e.cal]):null)])])));
+    app.appendChild(el("section",null,[secHead("Tomorrow"),ag,el("div",null,[el("p",{class:"lbl"},["Top 3 for tomorrow"]),topThree("daily",key,data.top3)])]));
+  } else { app.appendChild(el("section",null,[el("div",{class:"empty"},[el("b",null,["No connected work data for this day. "]),"Your practices and reflection still save."])])); }
+  app.appendChild(reflectionSection("daily",key,DAILY_FIELDS)); }
+function buildWeekly(app){ const mon=startOfWeek(state.weekly),sun=addDays(mon,6),key=weekKey(state.weekly),data=getData("weekly",key);
+  if(data){ const cols=el("div",{class:"cols"});
+    const cw=el("div",null,[el("p",{class:"colhead good"},[el("span",{class:"dt"}),"Wins"])]); const uw=el("ul",{class:"list"}); data.wins.forEach(x=>uw.appendChild(el("li",{class:"row"},[el("span",{class:"lead"}),el("span",{class:"body"},[x.t])]))); cw.appendChild(uw);
+    const cs=el("div",null,[el("p",{class:"colhead warn"},[el("span",{class:"dt"}),"Slipping"])]); const us=el("ul",{class:"list"}); data.slipping.forEach(x=>us.appendChild(el("li",null,[checkRow("weekly",key,x)]))); cs.appendChild(us);
+    cols.append(cw,cs); app.appendChild(el("section",null,[secHead("The week in review"),cols])); }
+  app.appendChild(areasSection(key,data)); app.appendChild(weekPracticesSection(mon));
+  if(data){ const ag=el("div",{class:"agenda"}); data.ahead.forEach(e=>ag.appendChild(el("div",{class:"ag"},[el("time",null,[e.time]),el("div",{class:"what"},[e.what])])));
+    app.appendChild(el("section",null,[secHead("The week ahead"),ag,el("div",null,[el("p",{class:"lbl"},["Top 3 for the week"]),topThree("weekly",key,data.top3)])])); }
+  app.appendChild(reflectionSection("weekly",key,WEEKLY_FIELDS)); }
+
+/* ===== GEM ENGINE ===== */
+const Gem=(function(){
+  let cv,ctx,W,H,cx,cy,R,dpr,facets=[],raf=null;
+  let lightA=0,autoLight=true,lightDir={x:0.7,y:-0.7};
+  let spin=0,spinVel=0,dragging=false,lastX=0,brilliance=0.7,sparkles=[],lastNow=0,t0=0;
+  const reduce=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function build(){ facets=[]; const N=16; const rTable=0.34*R, ri=rTable*Math.cos(Math.PI/8); const r1=0.60*R,r2=0.82*R,rO=0.985*R;
+    const OB=[],A=[],B=[],O=[];
+    for(let k=0;k<N;k++){ const ang=k*Math.PI/8; const rob=(k%2===1)?rTable:ri;
+      OB.push({x:Math.cos(ang)*rob,y:Math.sin(ang)*rob}); A.push({x:Math.cos(ang)*r1,y:Math.sin(ang)*r1}); B.push({x:Math.cos(ang)*r2,y:Math.sin(ang)*r2}); O.push({x:Math.cos(ang)*rO,y:Math.sin(ang)*rO}); }
+    function q(a,b,c,d,ring){ facets.push({pts:[a,b,c,d],ring}); }
+    for(let k=0;k<N;k++){ const n=(k+1)%N; q(OB[k],OB[n],A[n],A[k],"star"); q(A[k],A[n],B[n],B[k],"main"); q(B[k],B[n],O[n],O[k],"girdle"); }
+    const tbl=[]; for(let k=1;k<N;k+=2)tbl.push(OB[k]); facets.push({pts:tbl,ring:"table"});
+    facets.forEach(f=>{ let sx=0,sy=0; f.pts.forEach(p=>{sx+=p.x;sy+=p.y;}); const mx=sx/f.pts.length,my=sy/f.pts.length; const d=Math.hypot(mx,my)||1; f.mx=mx; f.my=my; f.nx=mx/d; f.ny=my/d; f.ang=Math.atan2(my,mx); f.seed=Math.random(); }); }
+  function resize(){ const r=cv.getBoundingClientRect(); dpr=Math.min(window.devicePixelRatio||1,2); W=r.width; H=r.height; cv.width=W*dpr; cv.height=H*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); cx=W/2; cy=H/2; R=Math.min(W,H)/2*0.96; build(); }
+  function hsl2(h,s,l){ h=((h%360)+360)%360/360; const a=s*Math.min(l,1-l); const f=n=>{const k=(n+h*12)%12; return l-a*Math.max(-1,Math.min(k-3,9-k,1));}; return [f(0)*255,f(8)*255,f(4)*255]; }
+  function cl(x){ return Math.max(0,Math.min(255,x|0)); }
+  function col(f,bright,now){ const topLift=(-f.ny*0.5+0.5);
+    const C0=[15+9*topLift+7*f.seed, 20+9*topLift, 30+12*topLift];
+    const gold=[241,209,136],white=[225,236,248]; const gmix=0.28+0.55*brilliance;
+    let hi=[gold[0]*gmix+white[0]*(1-gmix),gold[1]*gmix+white[1]*(1-gmix),gold[2]*gmix+white[2]*(1-gmix)];
+    const fire=Math.max(0,(bright-0.72)/0.28);
+    if(fire>0){ const spec=hsl2(f.seed*360+now*0.03,0.78,0.62); const fa=fire*0.55; hi=[hi[0]*(1-fa)+spec[0]*fa,hi[1]*(1-fa)+spec[1]*fa,hi[2]*(1-fa)+spec[2]*fa]; }
+    return "rgb("+cl(C0[0]+(hi[0]-C0[0])*bright)+","+cl(C0[1]+(hi[1]-C0[1])*bright)+","+cl(C0[2]+(hi[2]-C0[2])*bright)+")"; }
+  function spark(s){ ctx.save(); ctx.globalCompositeOperation="lighter"; ctx.translate(s.x,s.y); const a=s.a;
+    const grd=ctx.createRadialGradient(0,0,0,0,0,s.s); grd.addColorStop(0,"rgba(255,248,225,"+(0.85*a)+")"); grd.addColorStop(1,"rgba(255,248,225,0)"); ctx.fillStyle=grd; ctx.beginPath(); ctx.arc(0,0,s.s,0,7); ctx.fill();
+    ctx.strokeStyle="rgba(255,252,242,"+(0.9*a)+")"; ctx.lineWidth=1; ctx.beginPath(); ctx.moveTo(-s.s,0);ctx.lineTo(s.s,0);ctx.moveTo(0,-s.s);ctx.lineTo(0,s.s); ctx.stroke(); ctx.restore(); }
+  function frame(now){ const dt=Math.min(50,now-lastNow); lastNow=now;
+    if(!reduce){ if(autoLight)lightA+=0.0007*dt; spin+=spinVel*dt; spinVel*=Math.pow(0.93,dt/16.67); if(Math.abs(spinVel)<0.00002){spinVel=0; if(!dragging)spin+=0.00004*dt;} }
+    const lx=autoLight?Math.cos(lightA):lightDir.x, ly=autoLight?Math.sin(lightA):lightDir.y;
+    const l2a=lightA*0.6+2.3, l2x=Math.cos(l2a), l2y=Math.sin(l2a);
+    ctx.clearRect(0,0,W,H);
+    const glow=ctx.createRadialGradient(cx,cy,R*0.1,cx,cy,R*1.5); glow.addColorStop(0,"rgba(205,162,79,"+(0.10+0.12*brilliance)+")"); glow.addColorStop(1,"rgba(205,162,79,0)"); ctx.fillStyle=glow; ctx.beginPath(); ctx.arc(cx,cy,R*1.5,0,7); ctx.fill();
+    const breath=reduce?1:(1+0.012*Math.sin(now*0.001)); const ca=Math.cos(spin),sa=Math.sin(spin);
+    facets.forEach(f=>{ const pts=f.pts.map(p=>({x:cx+(p.x*ca-p.y*sa)*breath,y:cy+(p.x*sa+p.y*ca)*breath}));
+      const nx=f.nx*ca-f.ny*sa, ny=f.nx*sa+f.ny*ca; const d1=nx*lx+ny*ly, d2=nx*l2x+ny*l2y;
+      const pw=f.ring==="table"?1.7:3.0;
+      let b1=Math.pow(Math.max(0,(d1+1)/2),pw), b2=0.55*Math.pow(Math.max(0,(d2+1)/2),3.4);
+      let bright=1-(1-b1)*(1-b2);
+      const sp=Math.max(0,Math.max(d1,d2)-0.86)/0.14; bright+=sp*sp*0.5;
+      bright+=(f.ring==="table"?0.15:0.05)*(0.5+0.5*Math.sin(f.seed*12+now*0.0009));
+      if(f.ring==="table")bright=Math.max(bright,0.17+0.4*b1);
+      bright*=(0.7+0.6*brilliance); bright=Math.min(1,Math.max(0,bright));
+      ctx.fillStyle=col(f,bright,now); ctx.beginPath(); pts.forEach((p,i)=>i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y)); ctx.closePath(); ctx.fill();
+      ctx.strokeStyle="rgba(8,10,14,0.5)"; ctx.lineWidth=0.8; ctx.stroke();
+      if(!reduce&&bright>0.8&&Math.random()<0.02*(0.4+brilliance)){ const mx=cx+(f.mx*ca-f.my*sa)*breath, my=cy+(f.mx*sa+f.my*ca)*breath; sparkles.push({x:mx,y:my,a:1,s:R*0.05*(0.6+Math.random())}); } });
+    ctx.strokeStyle="rgba(205,162,79,0.28)"; ctx.lineWidth=1.2; ctx.beginPath(); ctx.arc(cx,cy,R*0.985*breath,0,7); ctx.stroke();
+    if(sparkles.length>60)sparkles.splice(0,sparkles.length-60);
+    sparkles=sparkles.filter(s=>s.a>0.03); sparkles.forEach(s=>{ s.a*=Math.pow(0.9,dt/16.67); spark(s); });
+    if(!reduce)raf=requestAnimationFrame(frame); }
+  function setBrilliance(x){ brilliance=Math.max(0.15,Math.min(1,x)); if(reduce)draw(); }
+  function draw(){ lastNow=performance.now(); frame(performance.now()); }
+  function init(){ cv=document.getElementById("gem"); if(!cv)return; ctx=cv.getContext("2d"); if(!ctx)return; t0=performance.now(); resize(); window.addEventListener("resize",resize);
+    cv.addEventListener("pointermove",ev=>{ const r=cv.getBoundingClientRect(); const mx=(ev.clientX-r.left)-cx,my=(ev.clientY-r.top)-cy; const d=Math.hypot(mx,my)||1; lightDir={x:mx/d,y:my/d}; autoLight=false;
+      if(dragging){ const dx=ev.clientX-lastX; spin+=dx*0.006; spinVel=dx*0.0007; lastX=ev.clientX; } });
+    cv.addEventListener("pointerleave",()=>{ if(!dragging)autoLight=true; });
+    cv.addEventListener("pointerdown",ev=>{ dragging=true; lastX=ev.clientX; try{cv.setPointerCapture(ev.pointerId)}catch(e){} });
+    window.addEventListener("pointerup",()=>{ dragging=false; });
+    lastNow=performance.now(); if(reduce)draw(); else raf=requestAnimationFrame(frame);
+    setTimeout(()=>{ const h=document.getElementById("h-hint"); if(h)h.style.opacity="0.35"; },5000);
+  }
+  return {init,setBrilliance}; })();
+
+try{ Gem.init(); }catch(e){ console.warn("gem init failed",e); }
+render();
+buildPanel();
+const gsiEl=document.getElementById("gsi"); if(gsiEl)gsiEl.addEventListener("load",()=>{ initGoogle(); updatePanel(); });
+window.addEventListener("load",()=>{ initGoogle(); updatePanel(); if(LIVE.on)refreshLive(); });
+</script>
+</body>
+</html>
